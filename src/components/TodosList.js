@@ -2,24 +2,34 @@ import React from "react";
 import TodoItem from "./TodoItem";
 
 const TodosList = (props) => {
+  const {
+    todos,
+    tags,
+    users,
+    addTag,
+    handleChangeProps,
+    deleteTodoProps,
+    removeTag,
+    assignUserToTodo,
+  } = props;
 
   return (
     <div>
-      {props.todos.map(todo => (
+      {todos.map((todo) => (
         <TodoItem
           key={todo.id}
           todo={todo}
-          users={props.users}
-          tags={props.tags}
-          handleChangeProps={props.handleChangeProps}
-          deleteTodoProps={props.deleteTodoProps}
-          addTag={props.addTag}
-          removeTag={props.removeTag}
-          assignUserToTodo={props.assignUserToTodo}
+          users={users}
+          tags={tags}
+          handleChangeProps={handleChangeProps}
+          deleteTodoProps={deleteTodoProps}
+          addTag={addTag}
+          removeTag={removeTag}
+          assignUserToTodo={assignUserToTodo}
         />
       ))}
     </div>
   );
-}
+};
 
 export default TodosList;

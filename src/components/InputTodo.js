@@ -1,18 +1,23 @@
 import React, { useState, useCallback } from "react";
 
 const InputTodo = (props) => {
+  const [title, setTitle] = useState("");
 
-  const [title, setTitle] = useState('');
+  const onChange = useCallback(
+    (e) => {
+      setTitle(e.target.value);
+    },
+    [setTitle]
+  );
 
-  const onChange = useCallback((e) => {
-    setTitle(e.target.value);
-  }, [setTitle]);
-
-  const handleSubmit = useCallback((e) => {
-    e.preventDefault();
-    props.addTodoProps(title);
-    setTitle('');
-  }, [setTitle, title, props]);
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      props.addTodoProps(title);
+      setTitle("");
+    },
+    [setTitle, title, props]
+  );
 
   return (
     <form onSubmit={handleSubmit} className="form-container">
@@ -27,5 +32,5 @@ const InputTodo = (props) => {
       <input type="submit" className="input-submit" value="Submit" />
     </form>
   );
-}
+};
 export default InputTodo;

@@ -1,10 +1,11 @@
 import React from "react";
 
+const headerStyle = {
+  padding: "20px 0",
+  lineHeight: "2em",
+};
+
 const Header = () => {
-  const headerStyle = {
-    padding: "20px 0",
-    lineHeight: "2em"
-  };
   return (
     <header style={headerStyle}>
       <h1 style={{ fontSize: "25px", marginBottom: "15px" }}>
