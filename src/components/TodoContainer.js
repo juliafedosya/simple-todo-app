@@ -10,39 +10,78 @@ const INITIAL_TODOS = [
     id: uuidv4(),
     title: "Setup development environment",
     completed: true,
+    tags : []
   },
   {
     id: uuidv4(),
     title: "Develop website and add content",
     completed: false,
+    tags : []
   },
   {
     id: uuidv4(),
     title: "Deploy to live server",
     completed: false,
+    tags : []
   },
+];
+
+const INITIAL_TAGS = [
+  {
+    id: uuidv4(),
+    name: 'work',
+    color : '#f00'
+  },
+  {
+    id: uuidv4(),
+    name: 'home',
+    color : '#ff0'
+  },
+  {
+    id: uuidv4(),
+    name: 'urgent',
+    color : '#f0f'
+  },
+  {
+    id: uuidv4(),
+    name: 'morning',
+    color : '#0f0'
+  },
+  {
+    id: uuidv4(),
+    name: 'weekend',
+    color : '#00f'
+  }
 ];
 
 function getInitialTodos() {
   if(localStorage.getItem('todos') === null) {
-    console.log('todos are not in the local storage');
     return INITIAL_TODOS;
   }
-
-   console.log('todos', localStorage.getItem('todos'));
 
   return JSON.parse(localStorage.getItem('todos'));
 }
 
+function getInitialTags() {
+  if(localStorage.getItem('tags') === null) {
+    return INITIAL_TAGS;
+  }
+
+  return JSON.parse(localStorage.getItem('tags'));
+}
 
 const TodoContainer = () => {
   const [todos, setTodos] = useState(getInitialTodos());
   const [showOnlyCompleted, setShowOnlyCompleted] = useState(false);
+  const [tags, setTags] = useState(getInitialTags());
 
   useEffect(() => {
-    console.log('todos when useEffect is called', todos);
     localStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
+
+  useEffect(() => {
+    localStorage.setItem('tags', JSON.stringify(tags));
+  }, [tags]);
 
   const todosToDisplay = useMemo(() => {
     if(showOnlyCompleted) {
@@ -73,9 +112,36 @@ const TodoContainer = () => {
       id: uuidv4(),
       title: title,
       completed: false,
+      tags: []
     };
     setTodos([...todos, newTodo]);
   }, [todos, setTodos]);
+
+  const addTag = useCallback((todoId, tagId) => {
+    const newTodos = todos.map((todo) => {
+      if(todo.id === todoId) {
+        return {
+          ...todo,
+          tags : [...todo.tags, tagId]
+        }
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+  }, [setTodos, todos]);
+
+  const removeTag = useCallback((todoId, tagId) => {
+    const newTodos = todos.map((todo) => {
+      if(todo.id === todoId && todo.tags.includes(tagId)) {
+        return {
+          ...todo,
+          tags : todo.tags.filter(t => tagId !== t)
+        };
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+  }, [setTodos, todos]);
 
   return (
     <div className="container">
@@ -88,8 +154,11 @@ const TodoContainer = () => {
       </p>
       <TodosList
         todos={todosToDisplay}
+        tags={tags}
         handleChangeProps={handleChange}
         deleteTodoProps={deleteTodo}
+        addTag={addTag}
+        removeTag={removeTag}
       />
     </div>
   );

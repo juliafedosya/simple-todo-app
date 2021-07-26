@@ -65,3 +65,16 @@ body {
   opacity: 0.4;
   text-decoration: line-through;
 }
+
+#modal-outer-layer {
+  background-color: #1f1f1f;
+  width: 100vw;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  opacity: 0.6;
+}

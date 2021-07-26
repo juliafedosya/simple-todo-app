@@ -10,6 +10,9 @@ const TodosList = (props) => {
           todo={todo}
           handleChangeProps={props.handleChangeProps}
           deleteTodoProps={props.deleteTodoProps}
+          tags={props.tags}
+          addTag={props.addTag}
+          removeTag={props.removeTag}
         />
       ))}
     </div>
