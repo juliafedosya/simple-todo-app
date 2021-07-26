@@ -4,28 +4,6 @@ import Header from "./Header";
 import InputTodo from "./InputTodo";
 import { v4 as uuidv4 } from "uuid";
 
-
-const INITIAL_TODOS = [
-  {
-    id: uuidv4(),
-    title: "Setup development environment",
-    completed: true,
-    tags : []
-  },
-  {
-    id: uuidv4(),
-    title: "Develop website and add content",
-    completed: false,
-    tags : []
-  },
-  {
-    id: uuidv4(),
-    title: "Deploy to live server",
-    completed: false,
-    tags : []
-  },
-];
-
 const INITIAL_TAGS = [
   {
     id: uuidv4(),
@@ -54,6 +32,54 @@ const INITIAL_TAGS = [
   }
 ];
 
+const UNASSIGNED_USER = {
+  id: uuidv4(),
+  name: 'Unassigned'
+};
+
+const INITIAL_USERS = [
+  {
+    id: uuidv4(),
+    name: 'Yuliia'
+  },
+  {
+    id: uuidv4(),
+    name: 'John',
+  },
+  {
+    id: uuidv4(),
+    name: 'Thomas'
+  },
+  {
+    id: uuidv4(),
+    name: 'Mark'
+  },
+  UNASSIGNED_USER
+];
+
+const INITIAL_TODOS = [
+  {
+    id: uuidv4(),
+    title: "Setup development environment",
+    completed: true,
+    tags : [],
+    assignedUserId : UNASSIGNED_USER.id
+  },
+  {
+    id: uuidv4(),
+    title: "Develop website and add content",
+    completed: false,
+    tags : [],
+    assignedUserId : UNASSIGNED_USER.id
+  },
+  {
+    id: uuidv4(),
+    title: "Deploy to live server",
+    completed: false,
+    tags : [],
+    assignedUserId : UNASSIGNED_USER.id
+  },
+];
 function getInitialTodos() {
   if(localStorage.getItem('todos') === null) {
     return INITIAL_TODOS;
@@ -70,10 +96,19 @@ function getInitialTags() {
   return JSON.parse(localStorage.getItem('tags'));
 }
 
+function getInitialUsers() {
+  if(localStorage.getItem('users') === null) {
+    return INITIAL_USERS;
+  }
+
+  return JSON.parse(localStorage.getItem('users'));
+}
+
 const TodoContainer = () => {
   const [todos, setTodos] = useState(getInitialTodos());
-  const [showOnlyCompleted, setShowOnlyCompleted] = useState(false);
+  const [users, setUsers] = useState(getInitialUsers());
   const [tags, setTags] = useState(getInitialTags());
+  const [showOnlyCompleted, setShowOnlyCompleted] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
@@ -82,6 +117,10 @@ const TodoContainer = () => {
   useEffect(() => {
     localStorage.setItem('tags', JSON.stringify(tags));
   }, [tags]);
+
+  useEffect(() => {
+    localStorage.setItem('users', JSON.stringify(users));
+  }, [users]);
 
   const todosToDisplay = useMemo(() => {
     if(showOnlyCompleted) {
@@ -112,7 +151,8 @@ const TodoContainer = () => {
       id: uuidv4(),
       title: title,
       completed: false,
-      tags: []
+      tags: [],
+      assignedUserId : UNASSIGNED_USER.id
     };
     setTodos([...todos, newTodo]);
   }, [todos, setTodos]);
@@ -143,6 +183,21 @@ const TodoContainer = () => {
     setTodos(newTodos);
   }, [setTodos, todos]);
 
+  const assignUserToTodo = useCallback((todoId, userId) => {
+    const newTodos = todos.map(t => {
+      if (t.id === todoId) {
+        return {
+          ...t,
+          assignedUserId: userId
+        }
+      }
+
+      return t
+    })
+
+    setTodos(newTodos)
+  }, [todos, setTodos]);
+
   return (
     <div className="container">
       <Header />
@@ -155,10 +210,12 @@ const TodoContainer = () => {
       <TodosList
         todos={todosToDisplay}
         tags={tags}
+        users={users}
         handleChangeProps={handleChange}
         deleteTodoProps={deleteTodo}
         addTag={addTag}
         removeTag={removeTag}
+        assignUserToTodo={assignUserToTodo}
       />
     </div>
   );
