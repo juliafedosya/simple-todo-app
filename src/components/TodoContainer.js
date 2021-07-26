@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import TodosList from "./TodosList";
 import Header from "./Header";
 import InputTodo from "./InputTodo";
@@ -23,77 +23,33 @@ const INITIAL_TODOS = [
   },
 ];
 
-// class TodoContainer extends React.Component {
-//   state = {
-//     todos: [
-//       {
-//         id: uuidv4(),
-//         title: "Setup development environment",
-//         completed: true,
-//       },
-//       {
-//         id: uuidv4(),
-//         title: "Develop website and add content",
-//         completed: false,
-//       },
-//       {
-//         id: uuidv4(),
-//         title: "Deploy to live server",
-//         completed: false,
-//       },
-//     ],
-//   };
+function getInitialTodos() {
+  if(localStorage.getItem('todos') === null) {
+    console.log('todos are not in the local storage');
+    return INITIAL_TODOS;
+  }
 
-//   handleChange = (id) => {
-//     this.setState({
-//       todos: this.state.todos.map((todo) => {
-//         if (todo.id === id) {
-//           todo.completed = !todo.completed;
-//         }
-//         return todo;
-//       }),
-//     });
-//   };
+   console.log('todos', localStorage.getItem('todos'));
 
-//   delTodo = (id) => {
-//     this.setState({
-//       todos: [
-//         ...this.state.todos.filter((todo) => {
-//           return todo.id !== id;
-//         }),
-//       ],
-//     });
-//   };
+  return JSON.parse(localStorage.getItem('todos'));
+}
 
-//   addTodoItem = (title) => {
-//     const newTodo = {
-//       // id: uuid.v4(),
-//       id: uuidv4(),
-//       title: title,
-//       completed: false,
-//     };
-//     this.setState({
-//       todos: [...this.state.todos, newTodo],
-//     });
-//   };
-
-//   render() {
-//     return (
-//       <div className="container">
-//         <Header />
-//         <InputTodo addTodoProps={this.addTodoItem} />
-//         <TodosList
-//           todos={this.state.todos}
-//           handleChangeProps={this.handleChange}
-//           deleteTodoProps={this.delTodo}
-//         />
-//       </div>
-//     );
-//   }
-// }
 
 const TodoContainer = () => {
-  const [todos, setTodos] = useState(INITIAL_TODOS);
+  const [todos, setTodos] = useState(getInitialTodos());
+  const [showOnlyCompleted, setShowOnlyCompleted] = useState(false);
+
+  useEffect(() => {
+    console.log('todos when useEffect is called', todos);
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
+
+  const todosToDisplay = useMemo(() => {
+    if(showOnlyCompleted) {
+      return todos.filter(t => t.completed);
+    }
+    return todos;
+  },[showOnlyCompleted, todos]);
 
   const handleChange = useCallback((id) => {
     setTodos(todos.map((todo) => {
@@ -125,8 +81,13 @@ const TodoContainer = () => {
     <div className="container">
       <Header />
       <InputTodo addTodoProps={addTodoItem} />
+      <p>
+        <label> Show only completed </label>
+        {' '}
+        <input type='checkbox' value={showOnlyCompleted} onChange={(e) => setShowOnlyCompleted(e.target.checked)}></input>
+      </p>
       <TodosList
-        todos={todos}
+        todos={todosToDisplay}
         handleChangeProps={handleChange}
         deleteTodoProps={deleteTodo}
       />
